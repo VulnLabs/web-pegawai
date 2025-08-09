@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app
+    container_name: sqli-app
+    hostname: sqli-box
+    ports:
+      - "8083:80"
+      - "2223:22"
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - sqli-net
+
+  db:
+    image: mariadb:10.5
+    container_name: sqli-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: company
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: secret
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sqli-net
+
+networks:
+  sqli-net:
